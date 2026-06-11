@@ -43,7 +43,7 @@
    * @param {Element} el - DOM 元素
    */
   function show(el) {
-    if (el) el.style.display = '';
+    if (el) el.style.removeProperty('display');
   }
 
   /**
@@ -295,7 +295,7 @@
     UNAUTHORIZED: 'API Key 配置错误或已过期',
     RATE_LIMITED: '请求过于频繁，请稍后再试',
     INTERNAL_ERROR: '服务器内部错误，请稍后重试',
-    SERVICE_UNAVAILABLE: '百炼服务繁忙，请稍后重试',
+    SERVICE_UNAVAILABLE: '服务繁忙，请稍后重试',
     NETWORK_ERROR: '网络连接异常，请检查网络后重试',
     TIMEOUT: '请求超时，请稍后重试',
     UNKNOWN: '未知错误，请稍后重试',

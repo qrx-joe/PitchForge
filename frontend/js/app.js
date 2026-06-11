@@ -17,6 +17,13 @@
   'use strict';
 
   // ============================================================
+  // 从全局工具库解构函数
+  // ============================================================
+
+  const { $, show, hide, renderMarkdown, copyToClipboard, debounce, formatDuration, getErrorMessage } = PitchForgeUtils;
+  const { generatePitch: apiGeneratePitch } = PitchForgeAPI;
+
+  // ============================================================
   // 状态管理
   // ============================================================
 
@@ -66,7 +73,7 @@
   // ============================================================
 
   const EXAMPLE_INPUT = {
-    project_idea: '我想做一个面向黑客松和 AI Workshop 参与者的 AI 路演助手。很多 Builder 有想法，也能做出 Demo，但很难在短时间内讲清楚项目价值、技术实现和未来方向。这个工具希望帮助用户把粗糙 idea 快速整理成项目结构、1 分钟路演稿、Demo 展示流程和评委问答。MVP 阶段使用阿里云百炼搭建 AI 能力，并用网页展示生成结果。',
+    project_idea: '我想做一个面向黑客松和 AI Workshop 参与者的 AI 路演助手。很多 Builder 有想法，也能做出 Demo，但很难在短时间内讲清楚项目价值、技术实现和未来方向。这个工具希望帮助用户把粗糙 idea 快速整理成项目结构、1 分钟路演稿、Demo 展示流程和评委问答。MVP 阶段使用阿里云搭建 AI 能力，并用网页展示生成结果。',
     target_user: '黑客松参与者、AI Workshop 学员',
     progress: '原型',
     pitch_duration: '1 分钟',
@@ -212,7 +219,7 @@
     dom.outputCards.forEach((card, idx) => {
       const content = sections[idx] || '';
       if (content) {
-        card.content.innerHTML = PitchForgeUtils.renderMarkdown(content);
+        card.content.innerHTML = renderMarkdown(content);
         show(card.card);
       } else {
         // 该模块无内容，隐藏卡片
@@ -258,15 +265,15 @@
     STATE.abortController = new AbortController();
 
     try {
-      // 模拟进度条（百炼 API 不返回中间进度，我们用定时器模拟）
+      // 模拟进度条（ API 不返回中间进度，我们用定时器模拟）
       simulateProgress();
 
-      const result = await PitchForgeAPI.generatePitch(input, STATE.abortController.signal);
+      const result = await apiGeneratePitch(input, STATE.abortController.signal);
 
-      const duration = PitchForgeUtils.formatDuration(performance.now() - startTime);
+      const duration = formatDuration(performance.now() - startTime);
 
       if (!result.success) {
-        const message = PitchForgeUtils.getErrorMessage(result.error.code);
+        const message = getErrorMessage(result.error.code);
         showError(`${message}${result.error.message ? ` (${result.error.message})` : ''}`);
         setLoading(false);
         return;
@@ -294,7 +301,7 @@
 
   /**
    * 模拟进度条（在没有流式输出的情况下提供视觉反馈）
-   * 业务背景：百炼工作流是黑盒调用，前端无法获得真实进度
+   * 业务背景：工作流是黑盒调用，前端无法获得真实进度
    * 但用户需要看到"系统在干活"，否则会以为卡死
    */
   function simulateProgress() {
@@ -347,7 +354,7 @@
     // 注意：实际复制内容应该是渲染前的 Markdown 文本
     // 简化方案：复制 textContent（用户拿到的是已渲染文本，凑合用）
     const text = target.innerText || target.textContent;
-    const ok = await PitchForgeUtils.copyToClipboard(text);
+    const ok = await copyToClipboard(text);
 
     if (ok) {
       const originalText = btn.textContent;
@@ -386,7 +393,7 @@
     dom.form.addEventListener('submit', handleSubmit);
 
     // 字符计数（防抖 100ms 避免高频触发）
-    dom.projectIdea.addEventListener('input', PitchForgeUtils.debounce(handleCharCount, 100));
+    dom.projectIdea.addEventListener('input', debounce(handleCharCount, 100));
 
     // 复制按钮（事件委托）
     dom.outputContainer.addEventListener('click', handleCopyClick);
