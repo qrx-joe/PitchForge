@@ -2,7 +2,7 @@
   "name": "pitchforge",
   "version": "0.1.0",
   "private": true,
-  "description": "PitchForge | 百炼路演工坊 - AI 路演包生成器",
+  "description": "PitchForge | 路演工坊 - AI 路演包生成器",
   "scripts": {
     "start": "node backend/server.js",
     "dev": "node --watch backend/server.js",
