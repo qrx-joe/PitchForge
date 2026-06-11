@@ -105,9 +105,22 @@ async function callBailianApplication(input) {
 
   // 构造请求体
   // 参考：Application Call API 文档
+  // 将整个 Prompt 作为 system message，用户输入 JSON 作为 user message
+  const systemPrompt = renderAggregatePrompt(input);
+  const userMessage = JSON.stringify({
+    project_idea: input.project_idea || '未提供',
+    target_user: input.target_user || '未指定',
+    progress: input.progress || '原型',
+    pitch_duration: input.pitch_duration || '1 分钟',
+    highlight: input.highlight || '未指定',
+  }, null, 2);
+
   const requestBody = {
     input: {
-      prompt: renderAggregatePrompt(input),
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage },
+      ],
     },
     parameters: {
       // 温度：0.7 是创作类任务常用值，平衡创造性和稳定性
@@ -160,14 +173,25 @@ function renderAggregatePrompt(input) {
   if (!template) {
     // 兜底：内联 Prompt
     return `你是一个资深的黑客松路演教练。
-基于用户输入生成项目结构、1 分钟路演稿、Demo 展示流程、评委问答 4 个模块的 Markdown 输出。`;
+基于用户输入生成项目结构、1 分钟路演稿、Demo 展示流程、评委问答 4 个模块的 Markdown 输出。
+
+用户输入：
+- project_idea: ${input.project_idea || '未提供'}
+- target_user: ${input.target_user || '未指定'}
+- progress: ${input.progress || '原型'}
+- pitch_duration: ${input.pitch_duration || '1 分钟'}
+- highlight: ${input.highlight || '未指定'}`;
   }
 
-  // 提取 System Prompt 部分（在 "---" 分割线之前）
-  const parts = template.split('---');
-  const systemPart = parts[0] || template;
+  // 替换模板变量
+  let rendered = template;
+  rendered = rendered.replace(/\{\{project_idea\}\}/g, input.project_idea || '未提供');
+  rendered = rendered.replace(/\{\{target_user\}\}/g, input.target_user || '未指定');
+  rendered = rendered.replace(/\{\{progress\}\}/g, input.progress || '原型');
+  rendered = rendered.replace(/\{\{pitch_duration\}\}/g, input.pitch_duration || '1 分钟');
+  rendered = rendered.replace(/\{\{highlight\}\}/g, input.highlight || '未指定');
 
-  return systemPart;
+  return rendered;
 }
 
 // ============================================================
