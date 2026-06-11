@@ -296,6 +296,8 @@
     RATE_LIMITED: '请求过于频繁，请稍后再试',
     INTERNAL_ERROR: '服务器内部错误，请稍后重试',
     SERVICE_UNAVAILABLE: '服务繁忙，请稍后重试',
+    BAD_GATEWAY: '网关错误，请稍后重试',
+    GATEWAY_TIMEOUT: '网关超时，请稍后重试',
     NETWORK_ERROR: '网络连接异常，请检查网络后重试',
     TIMEOUT: '请求超时，请稍后重试',
     UNKNOWN: '未知错误，请稍后重试',

@@ -30,6 +30,7 @@
   const STATE = {
     isGenerating: false,
     abortController: null,
+    progressTimers: [], // 存储进度定时器 ID，便于清理
   };
 
   // ============================================================
@@ -125,6 +126,9 @@
       show(dom.btnText);
       hide(dom.btnLoading);
       hide(dom.loadingProgress);
+      // 清理所有进度定时器
+      STATE.progressTimers.forEach((timerId) => clearTimeout(timerId));
+      STATE.progressTimers = [];
     }
   }
 
@@ -180,7 +184,8 @@
     content = content.trim();
 
     // 按标题切分（支持 ## 一、 或 ## 一： 或 ## 1. 等变体）
-    const splitRegex = /##\s*[一二三四][\s,，:：.。][^\n]*\n/g;
+    // 使用纯中文标点字符类，避免 Node V8 regex engine 的兼容性问题
+    const splitRegex = /##\s*[一二三四][、，:：.。][^\n]*\n/g;
     const parts = content.split(splitRegex).filter((p) => p.trim());
 
     // 如果切分出 4 段，逐一映射
@@ -305,6 +310,10 @@
    * 但用户需要看到"系统在干活"，否则会以为卡死
    */
   function simulateProgress() {
+    // 清理之前的定时器
+    STATE.progressTimers.forEach((timerId) => clearTimeout(timerId));
+    STATE.progressTimers = [];
+
     const steps = [
       { p: 15, t: '正在整理项目信息...', d: 0 },
       { p: 35, t: '正在生成路演稿...', d: 3000 },
@@ -314,11 +323,12 @@
     ];
 
     steps.forEach(({ p, t, d }) => {
-      setTimeout(() => {
+      const timerId = setTimeout(() => {
         if (STATE.isGenerating) {
           updateProgress(p, t);
         }
       }, d);
+      STATE.progressTimers.push(timerId);
     });
   }
 

@@ -144,7 +144,9 @@
     if (status === 400) return 'INVALID_INPUT';
     if (status === 401 || status === 403) return 'UNAUTHORIZED';
     if (status === 429) return 'RATE_LIMITED';
+    if (status === 502) return 'BAD_GATEWAY';
     if (status === 503) return 'SERVICE_UNAVAILABLE';
+    if (status === 504) return 'GATEWAY_TIMEOUT';
     return 'INTERNAL_ERROR';
   }
 
