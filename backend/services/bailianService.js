@@ -1,6 +1,6 @@
 /**
- * @fileoverview 阿里云百炼服务调用模块
- * @description 封装百炼 Application Call API，支持工作流和应用两种模式
+ * @fileoverview 阿里云服务调用模块
+ * @description 封装 Application Call API，支持工作流和应用两种模式
  * @author PitchForge Team
  * @version 1.0.0
  * @created 2026-06-11
@@ -104,7 +104,7 @@ async function callBailianApplication(input) {
   const url = `https://${CONFIG.REGION}.bailian.aliyuncs.com/api/v1/apps/${CONFIG.APP_ID}/completion`;
 
   // 构造请求体
-  // 参考：百炼 Application Call API 文档
+  // 参考：Application Call API 文档
   const requestBody = {
     input: {
       prompt: renderAggregatePrompt(input),
@@ -137,7 +137,7 @@ async function callBailianApplication(input) {
       || '';
 
     if (!text) {
-      throw createBailianError('EMPTY_RESPONSE', '百炼返回为空', response.data);
+      throw createBailianError('EMPTY_RESPONSE', 'API 返回为空', response.data);
     }
 
     return text;
@@ -208,10 +208,10 @@ async function generatePitch(input) {
 function normalizeError(err) {
   // axios 网络错误（无响应）
   if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
-    return createBailianError('TIMEOUT', '百炼服务响应超时', err.message);
+    return createBailianError('TIMEOUT', 'API 服务响应超时', err.message);
   }
   if (!err.response) {
-    return createBailianError('NETWORK_ERROR', '无法连接百炼服务', err.message);
+    return createBailianError('NETWORK_ERROR', '无法连接 API 服务', err.message);
   }
 
   // HTTP 错误
@@ -225,10 +225,10 @@ function normalizeError(err) {
     return createBailianError('RATE_LIMITED', '请求过于频繁', data);
   }
   if (status === 503) {
-    return createBailianError('SERVICE_UNAVAILABLE', '百炼服务繁忙', data);
+    return createBailianError('SERVICE_UNAVAILABLE', 'API 服务繁忙', data);
   }
   if (status >= 500) {
-    return createBailianError('SERVICE_UNAVAILABLE', `百炼服务异常 (${status})`, data);
+    return createBailianError('SERVICE_UNAVAILABLE', `API 服务异常 (${status})`, data);
   }
 
   return createBailianError('INTERNAL_ERROR', '生成失败', data);
