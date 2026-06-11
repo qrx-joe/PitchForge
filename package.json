@@ -1,0 +1,25 @@
+{
+  "name": "pitchforge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PitchForge | 百炼路演工坊 - AI 路演包生成器",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "mock": "cross-env MOCK_MODE=true node backend/server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
