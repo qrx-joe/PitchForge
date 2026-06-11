@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PitchForge | 百炼路演工坊</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 顶部：产品标题 -->
+  <header class="header">
+    <h1 class="header__title">PitchForge | 百炼路演工坊</h1>
+    <p class="header__subtitle">把粗糙 idea，快速打磨成可路演项目表达。</p>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="main">
+    <!-- 左侧：输入区 -->
+    <section class="input-section">
+      <h2 class="section-title">输入你的项目想法</h2>
+      <form id="pitchForm" class="form">
+        <div class="form-group">
+          <label for="project_idea" class="form-label">
+            项目想法 <span class="required">*</span>
+          </label>
+          <textarea 
+            id="project_idea" 
+            name="project_idea" 
+            class="form-textarea" 
+            placeholder="描述你的项目想法...例如：我想做一个面向黑客松参与者的 AI 路演助手"
+            required
+            maxlength="2000"
+          ></textarea>
+          <span class="char-count"><span id="charCount">0</span>/2000</span>
+        </div>
+
+        <div class="form-group">
+          <label for="target_user" class="form-label">目标用户 (选填)</label>
+          <input 
+            type="text" 
+            id="target_user" 
+            name="target_user" 
+            class="form-input" 
+            placeholder="例如：黑客松参与者、AI Workshop 学员"
+            maxlength="100"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="progress" class="form-label">当前进度 (选填)</label>
+          <select id="progress" name="progress" class="form-select">
+            <option value="">请选择</option>
+            <option value="idea">Idea 阶段</option>
+            <option value="原型">原型阶段</option>
+            <option value="Demo">Demo 阶段</option>
+            <option value="已上线">已上线</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="pitch_duration" class="form-label">路演时长 (选填)</label>
+          <select id="pitch_duration" name="pitch_duration" class="form-select">
+            <option value="1 分钟" selected>1 分钟</option>
+            <option value="30 秒">30 秒</option>
+            <option value="3 分钟">3 分钟</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="highlight" class="form-label">想突出的亮点 (选填)</label>
+          <input 
+            type="text" 
+            id="highlight" 
+            name="highlight" 
+            class="form-input" 
+            placeholder="例如：AI 能力、技术创新、商业价值"
+            maxlength="200"
+          />
+        </div>
+
+        <button type="submit" id="generateBtn" class="btn btn--primary">
+          <span class="btn__text">生成我的路演包</span>
+          <span class="btn__loading" style="display: none;">
+            <svg class="spinner" viewBox="0 0 50 50">
+              <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+            生成中...
+          </span>
+        </button>
+      </form>
+
+      <!-- 错误提示 -->
+      <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </section>
+
+    <!-- 右侧：输出区 -->
+    <section class="output-section">
+      <h2 class="section-title">生成结果</h2>
+      
+      <!-- 加载提示 -->
+      <div id="loadingProgress" class="loading-progress" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-bar__fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">正在初始化...</p>
+      </div>
+
+      <!-- 输出内容 -->
+      <div id="outputContainer" class="output-container">
+        <!-- 初始状态提示 -->
+        <div id="emptyState" class="empty-state">
+          <svg class="empty-state__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <p class="empty-state__text">输入项目想法后，这里会显示生成结果</p>
+          <p class="empty-state__hint">包括：项目结构、路演稿、Demo 流程、评委问答</p>
+        </div>
+
+        <!-- 项目结构 -->
+        <div id="projectStructure" class="output-card" style="display: none;">
+          <div class="output-card__header">
+            <h3 class="output-card__title">一、项目结构</h3>
+            <button class="btn-copy" data-target="structureContent">复制</button>
+          </div>
+          <div id="structureContent" class="output-card__content markdown-content"></div>
+        </div>
+
+        <!-- 1 分钟路演稿 -->
+        <div id="pitchScript" class="output-card" style="display: none;">
+          <div class="output-card__header">
+            <h3 class="output-card__title">二、1 分钟路演稿</h3>
+            <button class="btn-copy" data-target="pitchContent">复制</button>
+          </div>
+          <div id="pitchContent" class="output-card__content markdown-content"></div>
+        </div>
+
+        <!-- Demo 展示流程 -->
+        <div id="demoFlow" class="output-card" style="display: none;">
+          <div class="output-card__header">
+            <h3 class="output-card__title">三、Demo 展示流程</h3>
+            <button class="btn-copy" data-target="demoContent">复制</button>
+          </div>
+          <div id="demoContent" class="output-card__content markdown-content"></div>
+        </div>
+
+        <!-- 评委问答 -->
+        <div id="qaSection" class="output-card" style="display: none;">
+          <div class="output-card__header">
+            <h3 class="output-card__title">四、评委问答</h3>
+            <button class="btn-copy" data-target="qaContent">复制</button>
+          </div>
+          <div id="qaContent" class="output-card__content markdown-content"></div>
+        </div>
+      </div>
+
+      <!-- 成功提示 -->
+      <div id="successMessage" class="success-message" style="display: none;">
+        <svg class="success-message__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>
+        <span>生成完成！你可以点击复制按钮保存内容</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- 底部：示例输入 -->
+  <footer class="footer">
+    <div class="footer__content">
+      <h3 class="footer__title">示例输入</h3>
+      <p class="footer__description">点击快速填充示例，体验完整生成流程</p>
+      <button id="fillExample" class="btn btn--secondary">填充示例输入</button>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
